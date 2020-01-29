@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Facebook React</title>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+	<style type="text/css">
+		body,html{
+			margin: 50px;
+			font-family: sans-serif;
+			font-size: 13px;
+		}
+		.main-content{
+			box-shadow: 0px 0px 8px 3px rgba(100,100,100,0.3);
+			width: 400px;
+			border-radius: 10px;
+			margin: auto;
+			position: relative;
+		}
+		.post-class{
+			width: 100%;
+			position: relative;
+		}
+		.title{
+			font-weight: bold;
+			font-size: 15px;
+			padding: 20px;
+			width: calc(100% - 40px);
+		}
+		.img-content{
+			width: 100%;
+			border: 1px solid #ccc;
+			border-width: 1px 0px;
+		}
+		.img-class{
+			width: 100%;
+		}
+		.sameline-class{
+			display: flex;
+		}
+		.item-class{
+			width: calc(100% / 3);
+			text-align: center;
+			font-size: 15px;
+			font-weight: bold;
+			color:#666;
+			display: flex;
+			cursor: pointer;
+		}
+		.label-class{
+			padding: 10px;
+			width: calc(100% - 20px);
+		}
+		.react-box{
+			position: absolute;
+			top:0px;
+			left: 0px;
+			background: white;
+			border-radius: 20px;
+			border: 1px solid #999;
+			display: flex;
+		}
+		.emoji-content{
+			width: 40px;
+			height: 40px;
+			padding: 5px;
+			cursor: pointer;
+		}
+		.img-emoji{
+			width: 100%;
+		}
+		.emoji-name{
+			position: fixed;
+			top: 0px;
+			left: 0px;
+			background: #ddd;
+			color: #444;
+			border-radius: 10px;
+			padding: 5px;
+			font-weight: bold;
+		}
+		.like-class{
+			padding: 10px;
+			width: calc(100% / 3 - 20px);
+		}
+		.label-like-class{
+			padding: 0px;
+			width: 100%;
+		}
+		.emoji-selected{
+			width: 20px;
+			height: 20px;
+		}
+		.emoji-selected-img{
+			width: 100%;
+		}
+	</style>
+</head>
+<body>
+	<div class="main-content">
+		<div class="post-class">
+			<div class="title">Reacci&oacute;n de facebook</div>
+			<div class="img-content">
+				<img class="img-class" src="assets/meme.jpg"></img>
+			</div>
+			<div class="sameline-class">
+				<div class="item-class like-class">
+					<div class="emoji-selected">
+						<img class="emoji-selected-img" src=""/>
+					</div>
+					<div class="label-class label-like-class">Me gusta</div>
+				</div>
+				<div class="item-class">
+					<div class="label-class">Comentar</div>
+				</div>
+				<div class="item-class">
+					<div class="label-class">Compartir</div>
+				</div>
+			</div>
+		</div>
+		<div class="react-box" style="display: none;">
+			<div class="emoji-name" style="display: none;">Me agrada</div>
+			<div class="emoji-content" data-name="Me agrada" data-src="gusta" data-color="#1486ca">
+				<img class="img-emoji" src="assets/gusta.png"/>
+			</div>
+			<div class="emoji-content" data-name="Me apena" data-src="entristece" data-color="#e4ba1f">
+				<img class="img-emoji" src="assets/entristece.png"/>
+			</div>
+			<div class="emoji-content" data-name="Me enamora" data-src="encanta" data-color="#ef3f0a">
+				<img class="img-emoji" src="assets/encanta.png"/>
+			</div>
+			<div class="emoji-content" data-name="Me asusta" data-src="asusta" data-color="#c10aef">
+				<img class="img-emoji" src="assets/asusta.png"/>
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript">
+		//variable que contendra la animacion de desaparicion
+		var validar_emoji_box;
+		//tiempo antes de desaparecer (segundos)
+		var tiempo_salida=1;
+		$(document).ready(function(){
+			$(".like-class").hover(function(){
+				clearInterval(validar_emoji_box);//evita que desaparesca el react-box y falle la logica
+				//Cuando el mouse esta dentro de div like-class
+				$(".react-box").css("top",(this.offsetTop-55)+"px");
+				$(".react-box").fadeIn(200);
+			},function(){
+				//Cuando el mouse esta fuera de div like-class
+				validar_emoji_box=setTimeout(hide_emoji,tiempo_salida*1000);//tiempo esta en milisegundos en esta funcion
+			});
+			//misma logica que el like-class
+			$(".emoji-content").hover(function(){
+				clearInterval(validar_emoji_box);//evita que desaparesca el react-box
+				$(".emoji-name").empty();//borra el texto del div
+				$(".emoji-name").append(this.dataset.name);//toma el valor que esta dentro del atributo data-name y lo rellena en el div de emoji-name
+				$(".emoji-name").fadeIn(0);
+				$(".emoji-name").css("top",(this.getBoundingClientRect().y-25)+"px");
+				var ancho=document.getElementsByClassName("emoji-name")[0].getBoundingClientRect().width;//toma el ancho del div que tiene el nombre de la reaccion
+				$(".emoji-name").css("left",(this.getBoundingClientRect().x+25-ancho/2)+"px");//Coloca centrado el nombre sobre su reaccion respectiva
+			},function(){
+				$(".emoji-name").fadeOut(0);
+				validar_emoji_box=setTimeout(hide_emoji,tiempo_salida*1000);
+			});
+			// para cambiar la palabra "me gusta" del post
+			$(".emoji-content").click(function(){
+				$(".label-like-class").empty();
+				$(".label-like-class").append(this.dataset.name);
+				$(".label-like-class").css("color",this.dataset.color);//cambiara el color del texto
+				$(".emoji-selected-img").attr("src","assets/"+this.dataset.src+".png");//le asigna la misma imagen de la que se hace el click
+				hide_emoji();
+			});
+		});
+		//funcion para ocultar el react-box
+		function hide_emoji(){
+			$(".react-box").fadeOut(200);
+		}
+	</script>	
+</body>
+</html>
